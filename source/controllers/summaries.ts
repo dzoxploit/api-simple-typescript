@@ -63,16 +63,6 @@ const getBestSellingItem = async (
     });
   });
 
-  // const result: any = [];
-  // bestsellings.reduce(function (res: any, value: any) {
-  //   if (!res[value.item]) {
-  //     res[value.item] = { item: value.item, qty: 0 };
-  //     result.push(res[value.qty]);
-  //   }
-  //   res[value.item].qty += value.qty;
-  //   return res;
-  // }, {});
-
   var maxValue = fun(resultArr);
 
   return res.status(200).json({
@@ -80,114 +70,96 @@ const getBestSellingItem = async (
   });
 };
 
-// const getBestSellingCategory = async (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ) => {};
+const getBestSellingCategory = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const bestsellings: any = employee.Transaction;
 
-// const getRPC = async (req: Request, res: Response, next: NextFunction) => {};
+  const resultArr: any = [];
 
-// const getRevenue = async (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ) => {};
+  // grouping by location and resulting with an object using Array.reduce() method
+  const groupByItem = bestsellings.reduce((group: any, items: any) => {
+    const { item } = items;
+    group[item] = group[item] ?? [];
+    group[item].push(items.qty);
+    return group;
+  }, {});
 
-// const getBestSpenders = async (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ) => {};
+  // Finally calculating the sum based on the location array we have.
+  Object.keys(groupByItem).forEach((items: any) => {
+    groupByItem[items] = groupByItem[items].reduce((a: any, b: any) => a + b);
+    resultArr.push({
+      item: items,
+      qty: groupByItem[items],
+    });
+  });
 
-// // getting a single post
-// const getTransactions = async (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ) => {
-//   // get the post id from the req
-//   let id: string = req.params.id;
-//   // get the post
-//   let result: AxiosResponse = await axios.get(
-//     `https://jsonplaceholder.typicode.com/posts/${id}`
-//   );
-//   let summary: Summary = result.data;
-//   return res.status(200).json({
-//     message: summary,
-//   });
-// };
+  var maxValue = fun(resultArr);
 
-// const getSummaryTransaction = async (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ) => {};
+  const sellingcategory: any = employee.Items.find(
+    (record) => record.name === resultArr[maxValue].item
+  );
 
-// // updating a post
-// const updateTransactions = async (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ) => {
-//   // get the post id from the req.params
-//   let id: string = req.params.id;
-//   // get the data from req.body
-//   let title: string = req.body.title ?? null;
-//   let body: string = req.body.body ?? null;
-//   // update the post
-//   let response: AxiosResponse = await axios.put(
-//     `https://jsonplaceholder.typicode.com/posts/${id}`,
-//     {
-//       ...(title && { title }),
-//       ...(body && { body }),
-//     }
-//   );
-//   // return response
-//   return res.status(200).json({
-//     message: response.data,
-//   });
-// };
+  return res.status(200).json({
+    message: sellingcategory.type,
+  });
+};
 
-// // deleting a post
-// const deleteTransactions = async (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ) => {
-//   // get the post id from req.params
-//   let id: string = req.params.id;
-//   // delete the post
-//   let response: AxiosResponse = await axios.delete(
-//     `https://jsonplaceholder.typicode.com/posts/${id}`
-//   );
-//   // return response
-//   return res.status(200).json({
-//     message: "post deleted successfully",
-//   });
-// };
+const getRPC = async (req: Request, res: Response, next: NextFunction) => {
+  const getItems: any = employee.Items;
+  const bestsellings: any = employee.Transaction;
+  const resultArr: any = [];
+  const resultArr2: any = [];
 
-// // adding a post
-// const addTransactions = async (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ) => {
-//   // get the data from req.body
-//   let title: string = req.body.title;
-//   let body: string = req.body.body;
-//   // add the post
-//   let response: AxiosResponse = await axios.post(
-//     `https://jsonplaceholder.typicode.com/posts`,
-//     {
-//       title,
-//       body,
-//     }
-//   );
-//   // return response
-//   return res.status(200).json({
-//     message: response.data,
-//   });
-// };
+  for (let x in getItems) {
+    const revenuegoks: any = employee.Transaction.find(
+      (record) => (record.item = getItems[x].name)
+    );
 
-export default { getTotalTransactions, getBestSellingItem };
+    resultArr.push({
+      category: getItems[x].type,
+      revenue: revenuegoks,
+    });
+  }
+
+  return res.status(200).json({
+    message: resultArr,
+  });
+};
+
+const getRevenue = async (req: Request, res: Response, next: NextFunction) => {
+  const getItems: any = employee.Items;
+  const bestsellings: any = employee.Transaction;
+  const resultArr: any = [];
+  const resultArr2: any = [];
+
+  for (let x in getItems) {
+    const revenuegoks: any = employee.Transaction.find(
+      (record) => (record.item = getItems[x].name)
+    );
+
+    resultArr.push({
+      category: getItems[x].type,
+      revenue: revenuegoks,
+    });
+  }
+
+  return res.status(200).json({
+    message: resultArr,
+  });
+};
+
+const getBestSpenders = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {};
+
+export default {
+  getTotalTransactions,
+  getBestSellingItem,
+  getBestSellingCategory,
+  getRPC,
+};
