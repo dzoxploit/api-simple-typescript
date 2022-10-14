@@ -219,7 +219,61 @@ const getBestSpenders = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {};
+) => {
+  const bestsellings: any = employee.Transaction;
+  const resultArr: any = [];
+  const resultArr2: any = [];
+
+  for (let x in bestsellings) {
+    const cariItem: any = employee.Items.find(
+      (record) => record.name === bestsellings[x].item
+    )?.prices;
+
+    const cariBuyers = employee.Buyers.find(
+      (record) => record.name === bestsellings[x].buyer
+    )?.type;
+
+    const cariPrices = cariItem.find(
+      (record: any) => record.priceFor === cariBuyers
+    )?.price;
+
+    var revenue = cariPrices * bestsellings[x].qty;
+
+    resultArr.push({
+      name: bestsellings[x].buyer,
+      type: employee.Items.find(
+        (record) => record.name === bestsellings[x].item
+      )?.type,
+      revenue: revenue,
+    });
+  }
+
+  const groupByBuyer = resultArr.reduce((group: any, items: any) => {
+    const { name } = items;
+    group[name] = group[name] ?? [];
+    group[name].push(items.revenue);
+    return group;
+  }, {});
+
+  // Finally calculating the sum based on the location array we have.
+  Object.keys(groupByBuyer).forEach((items: any) => {
+    groupByBuyer[items] = groupByBuyer[items].reduce((a: any, b: any) => a + b);
+
+    const gokil: any = employee.Buyers.find(
+      (record) => record.name === items
+    )?.type;
+
+    resultArr2.push({
+      name: items,
+      type: gokil,
+      spent: groupByBuyer[items],
+    });
+  });
+
+  return res.status(200).json({
+    message: resultArr2.sort((a: any, b: any) => b.spent - a.spent),
+  });
+};
 
 export default {
   getTotalTransactions,
@@ -227,4 +281,5 @@ export default {
   getBestSellingCategory,
   getRPC,
   getRevenue,
+  getBestSpenders,
 };

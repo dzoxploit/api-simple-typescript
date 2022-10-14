@@ -8,6 +8,7 @@ router.get("/best-selling-item", controller.getBestSellingItem);
 router.get("/best-selling-category", controller.getBestSellingCategory);
 router.get("/get-rpc", controller.getRPC);
 router.get("/get-revenue", controller.getRevenue);
+router.get("/get-spenders", controller.getBestSpenders);
 // router.get("/posts/:id", controller.getPost);
 // router.put("/posts/:id", controller.updatePost);
 // router.delete("/posts/:id", controller.deletePost);
